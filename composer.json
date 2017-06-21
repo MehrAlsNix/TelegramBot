@@ -26,7 +26,7 @@
       "phpunit/php-code-coverage": "^5.2"
     },
     "require": {
-      "php": "7.0.*",
+      "php": "^7.0",
       "react/react": "^0.4",
       "react/http-client": "^0.4",
       "league/event": "^2.1"
