@@ -7,7 +7,7 @@ Classes for creating a bot for telegram
 [![Build Status](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/build.png?b=master)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/build-status/master)
 ## Example
 
-```
+```php
 $bot = new TelegramBot\Bot("BOT_TOKEN");
 $bot->addListener('/ping', new TelegramBot\Command\PingCommand);
 
