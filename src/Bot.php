@@ -80,7 +80,7 @@ class Bot implements BotInterface {
   /**
    * @param string $message
    */
-  public function getResponder($message): func {
+  public function getResponder($message) {
     return function ($text) use($message){
         $this->sendResponse($text, $message);
     };
@@ -130,7 +130,7 @@ class Bot implements BotInterface {
     );
   }
 
-  private function getResponseHeaders(string $responseString) :array {
+  public function getResponseHeaders(string $responseString) :array {
     return [
       'Content-Type' =>  'application/x-www-form-urlencoded',
       'Content-Length' => strlen($responseString)

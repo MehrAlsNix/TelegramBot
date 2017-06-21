@@ -40,4 +40,18 @@ class ReactRunnerTest extends TestBase {
       $this->object->runBot($botProphecy->reveal(), 1);
 
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testBotPollThrowsException()
+    {
+      $botProphecy = $this->prophesize(BotInterface::class);
+      $botProphecy->setClient(\Prophecy\Argument::any())->shouldBeCalled();
+      $botProphecy->poll()->willThrow(new \Exception());
+
+      $this->object->runBot($botProphecy->reveal(), 1);
+
+    }
+
 }
