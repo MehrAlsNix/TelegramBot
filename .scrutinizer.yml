@@ -14,5 +14,10 @@ coding_style:
             around_operators:
                 additive: false
                 concatenation: true
-build: true
-
+build:
+    tests:
+        override:
+            -
+                coverage:
+                    file: 'build/tmp/coverage.xml'
+                    format: 'clover'
