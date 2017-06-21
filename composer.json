@@ -8,7 +8,7 @@
         }
     ],
     "scripts": {
-      "test": "./vendor/bin/phpunit"
+      "run-tests": "./vendor/bin/phpunit"
     },
     "autoload": {
       "psr-4": {
