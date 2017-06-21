@@ -3,6 +3,8 @@
 namespace TelegramBot;
 
 use React\HttpClient\Client;
+use React\HttpClient\Request;
+use React\HttpClient\Response;
 
 class Bot implements BotInterface {
 
@@ -12,7 +14,7 @@ class Bot implements BotInterface {
   private $botToken;
   /** @var int */
   private $offset;
-  /** @var React\HttpClient\Client */
+  /** @var \React\HttpClient\Client */
   private $client;
 
   /**
@@ -23,7 +25,9 @@ class Bot implements BotInterface {
       $this->botToken = $botToken;
   }
 
-  /** @var React\HttpClient\Client */
+  /**
+   * @param \React\HttpClient\Client
+   */
   public function setClient(Client $client) {
     $this->client = $client;
   }
@@ -34,11 +38,18 @@ class Bot implements BotInterface {
     $request->end();
   }
 
-  public function _handlePollResponse($response) {
+  /**
+   * @param \React\HttpClient\Response $response
+   */
+  public function _handlePollResponse(Response $response) {
     $response->on('data', [$this, '_handlePollData']);
     $response->on('error', [$this, '_handlePollError']);
   }
 
+  /**
+   * @param array $data
+   * @param \React\HttpClient\Response $response
+   */
   public function _handlePollData($data, $response) {
     $data = json_decode($data, 1);
     $messageData = $data['result'];
@@ -58,21 +69,24 @@ class Bot implements BotInterface {
     }
   }
 
-  public function _handlePollError($response) {
+  /**
+   * @param \React\HttpClient\Response $response
+   */
+  public function _handlePollError(Response $response) {
     print('Error: ');
     print_r($response);
   }
 
   /**
-   *
+   * @param string $message
    */
-  public function getResponder($message) {
+  public function getResponder($message): func {
     return function ($text) use($message){
         $this->sendResponse($text, $message);
     };
   }
 
-  public function getMassagesRequest() {
+  public function getMassagesRequest(): Request {
     return $this->client->request(
       'GET',
       $this->botCommand('getUpdates', ['offset' => $this->offset])
