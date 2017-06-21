@@ -18,6 +18,7 @@ build:
     tests:
         override:
             -
+                command: "composer run-tests"
                 coverage:
                     file: 'build/tmp/coverage.xml'
                     format: 'clover'
