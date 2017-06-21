@@ -1,0 +1,34 @@
+{
+    "name": "mehr-als-nix/telegram-bot",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Mattias Meiner",
+            "email": "mattiasmeiner@gmail.com"
+        }
+    ],
+    "scripts": {
+      "test": "./vendor/bin/phpunit"
+    },
+    "autoload": {
+      "psr-4": {
+        "TelegramBot\\": "src/"
+      }
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "TelegramBot\\Test\\": "tests"
+      }
+
+    },
+    "require-dev": {
+      "phpunit/phpunit": "^6.2",
+      "phpunit/php-code-coverage": "^5.2"
+    },
+    "require": {
+      "php": "7.0.*",
+      "react/react": "^0.4",
+      "react/http-client": "^0.4",
+      "league/event": "^2.1"
+    }
+}

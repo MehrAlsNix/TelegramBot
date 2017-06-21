@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.2/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         forceCoversAnnotation="false"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         timeoutForSmallTests="1"
+         timeoutForMediumTests="10"
+         timeoutForLargeTests="60"
+         verbose="true">
+    <testsuite>
+        <directory suffix="Test.php">tests</directory>
+    </testsuite>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+      <log type="coverage-html" target="build/tmp/report" lowUpperBound="35"
+           highLowerBound="70"/>
+      <log type="coverage-clover" target="build/tmp/coverage.xml"/>
+      <log type="coverage-php" target="build/tmp/coverage.serialized"/>
+      <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+      <log type="junit" target="build/tmp/logfile.xml" logIncompleteSkipped="false"/>
+      <log type="testdox-html" target="build/tmp/testdox.html"/>
+      <log type="testdox-text" target="build/tmp/testdox.txt"/>
+    </logging>
+</phpunit>
