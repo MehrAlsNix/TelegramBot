@@ -5,6 +5,7 @@ namespace TelegramBot\Test;
 use League\Event\ListenerInterface;
 use League\Event\EventInterface;
 use TelegramBot\Command\PingCommand;
+use TelegramBot\APIMessage;
 
 
 class PingCommandTest extends TestBase {
@@ -30,9 +31,12 @@ class PingCommandTest extends TestBase {
       $callBack = $this->prophesize( \CallableInterface::class );
       $event->stopPropagation()->shouldBeCalled();
       $called = false;
-      $param = ['responder' => function() use (&$called){
-        $called = true;
-      }];
+      $param = [
+        'responder' => function() use (&$called){
+          $called = true;
+        },
+        'message' => new APIMessage([])
+      ];
 
       $this->object->handle($event->reveal(), $param);
       $this->assertTrue($called);
