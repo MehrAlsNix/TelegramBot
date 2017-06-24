@@ -3,11 +3,6 @@ namespace TelegramBot;
 
 use React\EventLoop\Factory as EventLoopFactory;
 
-;
-use React\HttpClient\Factory as HttpClientFactory;
-use React\HttpClient\Client;
-use React\Dns\Resolver\Factory as ResolverFactory;
-
 use React\EventLoop\LoopInterface;
 
 class ReactRunner implements RunnerInterface

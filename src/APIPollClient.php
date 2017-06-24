@@ -25,7 +25,7 @@ class APIPollClient
   }
 
   /**
-   * @param CallableInterface $responseInterface
+   * @param CallableInterface $responseHandler
    */
   public function poll($responseHandler)
   {

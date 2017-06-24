@@ -8,10 +8,6 @@ class Bot implements BotInterface
 {
     use \League\Event\EmitterTrait;
 
-  /** @var string */
-  private $botToken;
-  /** @var int */
-  private $offset;
   /** @var APIPollClient */
   private $client;
 

@@ -20,8 +20,8 @@ class PingCommand implements CommandInterface
     public function handle(EventInterface $event, $param = [])
     {
         $event->stopPropagation();
-      /** @var \Telegrambot\APIMessage */
-      $message = $param['message'];
+        /** @var \Telegrambot\APIMessage */
+        $message = $param['message'];
         $param['responder']('pong !');
     }
 }
