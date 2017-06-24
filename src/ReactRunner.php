@@ -1,7 +1,11 @@
 <?php
 namespace TelegramBot;
 
+use React\EventLoop\Factory as EventLoopFactory;;
+use React\HttpClient\Factory as HttpClientFactory;
 use React\HttpClient\Client;
+use React\Dns\Resolver\Factory as ResolverFactory;
+
 use React\EventLoop\LoopInterface;
 
 class ReactRunner implements RunnerInterface
@@ -10,45 +14,40 @@ class ReactRunner implements RunnerInterface
 
     public static function create() :ReactRunner
     {
-      $loop = \React\EventLoop\Factory::create();
+      /** @var LoopInterface */
+      $loop = EventLoopFactory::create();
 
-      $resolver = (new \React\Dns\Resolver\Factory)->create('8.8.8.8', $loop);
-      $client = (new \React\HttpClient\Factory)->create($loop, $resolver);
-
-      return new self($loop, $client);
+      return new self($loop);
     }
 
     /** @var LoopInterface */
     private $loop;
-    /** @var Client */
-    private $client;
 
     /**
      * @param \React\EventLoop\LoopInterface
      * @param \React\HttpClient\Client
      */
-    public function __construct(LoopInterface $loop, Client $client)
+    public function __construct(LoopInterface $loop)
     {
       $this->loop = $loop;
-      $this->client = $client;
     }
 
     /**
      * @param BotInterface
-     * @param integer $times
+     * @param integer $maxTimesToPoll
      */
-    public function runBot(BotInterface $bot, $times = null)
+    public function runBot(BotInterface $bot, $maxTimesToPoll = null)
     {
       $counter = 0;
-      $bot->setClient($this->client);
 
-      $this->loop->addPeriodicTimer(2, function (\React\EventLoop\Timer\Timer $timer) use ($bot, $times, &$counter) {
+      $this->loop->addPeriodicTimer(2, function (\React\EventLoop\Timer\Timer $timer) use ($bot, $maxTimesToPoll, &$counter) {
 
         $bot->poll();
 
-        if ( $times && $times >= $counter) {
+        if ( !is_null($maxTimesToPoll) && ($maxTimesToPoll >= $counter) ) {
           $this->loop->cancelTimer($timer);
         }
+
       });
 
       $this->loop->run();

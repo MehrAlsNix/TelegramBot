@@ -8,7 +8,7 @@ use React\HttpClient\Client;
 
 use Prophecy\Argument;
 
-class APIPollTest extends TestBase {
+class APIPollClientTest extends TestBase {
 
   /** @var \TelegramBot\Bot */
   private $object;
@@ -34,7 +34,7 @@ class APIPollTest extends TestBase {
   {
     $request = $this->prophesize( \React\HttpClient\Request::class);
     $request->on('response', Argument::cetera())->shouldBeCalled();
-    #$request->on('error', Argument::cetera())->shouldBeCalled();
+    $request->on('error', Argument::cetera())->shouldBeCalled();
     $request->end()->shouldBeCalled();
 
     $this->clientProphecy
@@ -43,8 +43,11 @@ class APIPollTest extends TestBase {
       ->shouldBeCalled();
 
     $executed = false;
-    $this->object->poll(function() use (&$executed) { $executed = true; });
-    $this->assertTrue($executed);
+    $this->object->poll(function() use (&$executed) {
+      $executed = true;
+    });
+
+    $this->assertFalse($executed, "callback has NOT been invoked");
   }
 
   public function testGetResponseHeaders() {

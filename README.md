@@ -8,10 +8,28 @@ Classes for creating a bot for telegram
 ## Example
 
 ```php
-$bot = new TelegramBot\Bot("BOT_TOKEN");
+#!/usr/bin/env php
+<?php
+require_once './vendor/autoload.php';
+
+/** @var LoopInterface */
+$loop = React\EventLoop\Factory::create();
+
+$runner = new TelegramBot\ReactRunner($loop);
+
+$resolverFactory = new React\Dns\Resolver\Factory();
+$resolver = $resolverFactory->create('8.8.8.8', $loop);
+$HttpClient = (new React\HttpClient\Factory)->create(
+  $loop,
+  $resolver
+);
+
+$apiClient = new TelegramBot\APIPollClient(getenv('BOT_TOKEN'), $HttpClient);
+
+$bot = new TelegramBot\Bot($apiClient);
+
 $bot->addListener('/ping', new TelegramBot\Command\PingCommand);
 
-$runner = TelegramBot\ReactRunner::create();
 $runner->runBot($bot);
 
 ```

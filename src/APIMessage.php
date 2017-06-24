@@ -2,6 +2,9 @@
 
 namespace TelegramBot;
 
+/**
+ * message from api
+ */
 class APIMessage
 {
   private $data;

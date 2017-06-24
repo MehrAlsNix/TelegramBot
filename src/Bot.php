@@ -1,10 +1,7 @@
 <?php
 
 namespace TelegramBot;
-
-use React\HttpClient\Client;
-use React\HttpClient\Request;
-use React\HttpClient\Response;
+use TelegramBot\APIMessage;
 
 class Bot implements BotInterface {
 
@@ -14,34 +11,25 @@ class Bot implements BotInterface {
   private $botToken;
   /** @var int */
   private $offset;
-  /** @var \React\HttpClient\Client */
+  /** @var APIPollClient */
   private $client;
 
   /**
-   * @param string $botToken
+   * @param APIClient $client
    */
-  public function __construct(string $botToken)
+  public function __construct(APIPollClient $client)
   {
-      $this->botToken = $botToken;
-  }
-
-  /**
-   * @param \React\HttpClient\Client
-   */
-  public function setClient(Client $client) {
-    $this->client = $client;
+      $this->client = $client;
   }
 
   public function poll() {
-    $request = $this->getMassagesRequest();
-    $request->on('response', [$this, '_handlePollResponse']);
-    $request->end();
+    $this->client->poll([$this, '_handlePollResponse']);
   }
 
   /**
    * @param \React\HttpClient\Response $response
    */
-  public function _handlePollResponse(Response $response) {
+  public function _handlePollResponse(\React\HttpClient\Response $response) {
     $response->on('data', [$this, '_handlePollData']);
     $response->on('error', [$this, '_handlePollError']);
   }
@@ -55,95 +43,36 @@ class Bot implements BotInterface {
     $messageData = $data['result'];
 
     foreach ($messageData as $message) {
+      $apiMessage = new APIMessage($message);
+      $this->client->markMessageHandled($apiMessage);
 
-      if (!isset($message['message']['text'])) {
+      if (!$apiMessage->hasText()) {
         continue;
       }
 
       $this->getEmitter()->emit(
-        $message['message']['text'],
-        ['message' => $message, 'responder' => $this->getResponder($message)]
+        $apiMessage->getText(),
+        ['message' => $message, 'responder' => $this->getResponder($apiMessage)]
       );
 
-      $this->setUpdateId($message['update_id']);
     }
   }
 
   /**
    * @param \React\HttpClient\Response $response
    */
-  public function _handlePollError(Response $response) {
-    print('Error: ');
-    print_r($response);
+  public function _handlePollError(\React\HttpClient\Response $response) {
+    throw new \Exception();
   }
 
   /**
-   * @param string $message
+   * @param APIMessage $message
+   * @return function
    */
-  public function getResponder($message) {
+  public function getResponder(APIMessage $message) {
     return function ($text) use($message){
-        $this->sendResponse($text, $message);
+        $this->client->send($text, $message);
     };
   }
 
-  public function getMassagesRequest(): Request {
-    return $this->client->request(
-      'GET',
-      $this->botCommand('getUpdates', ['offset' => $this->offset])
-    );
-  }
-
-  public function sendResponse(string $responseText, array $incomingMessage) {
-    $responseData = $this->postDataEncoder([
-      'chat_id' => $incomingMessage['message']['chat']['id'],
-      'reply_to_message_id' => $incomingMessage['message']['message_id'],
-      'text' => $responseText
-    ]);
-
-    $responseCall = $this->client->request(
-      'POST',
-      $this->botCommand('sendMessage'),
-      $this->getResponseHeaders($responseData)
-    );
-
-    $responseCall->end($responseData);
-  }
-
-  public function setUpdateId($id) {
-    $this->offset = $id+1;
-  }
-
-
-  private function botCommand(string $command, array $params = []) :string {
-    $params = (count($params)) ? '?' . $this->postDataEncoder($params) : '';
-
-    return $this->assembleUri($command, $params);
-  }
-
-
-  private function assembleUri($command, $params) :string {
-    return sprintf(
-      'https://api.telegram.org/bot%s/%s%s',
-      $this->botToken,
-      $command,
-      $params
-    );
-  }
-
-  public function getResponseHeaders(string $responseString) :array {
-    return [
-      'Content-Type' =>  'application/x-www-form-urlencoded',
-      'Content-Length' => strlen($responseString)
-    ];
-  }
-
-  private function postDataEncoder(array $data) :string {
-    $string = '';
-
-    foreach ($data as $k => $v) {
-      $string .= $k . '=' . urlencode($v) . '&';
-    }
-
-    return $string;
-  }
 }

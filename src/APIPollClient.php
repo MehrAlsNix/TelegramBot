@@ -33,7 +33,7 @@ class APIPollClient
       $this->botCommand('getUpdates', ['offset' => $this->offset])
     );
     $request->on('response', $responseHandler);
-    #$request->on('error', [$this, 'handleRequestError']);
+    $request->on('error', function($data) { throw new \Exception($data); });
     $request->end();
   }
 
@@ -54,7 +54,7 @@ class APIPollClient
   }
 
   public function markMessageHandled(APIMessage $message) {
-    $this->offset = $message->getUpdateId();
+    $this->offset = $message->getUpdateId() +1;
   }
 
   public function getResponseHeaders(string $responseString) :array {
