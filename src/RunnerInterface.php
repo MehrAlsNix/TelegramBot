@@ -2,6 +2,7 @@
 
 namespace TelegramBot;
 
-interface RunnerInterface {
-  public function runBot(BotInterface $bot, $times = null);
+interface RunnerInterface
+{
+    public function runBot(BotInterface $bot, $times = null);
 }

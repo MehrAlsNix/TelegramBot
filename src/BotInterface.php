@@ -2,6 +2,7 @@
 
 namespace TelegramBot;
 
-interface BotInterface {
-  public function poll();
+interface BotInterface
+{
+    public function poll();
 }
