@@ -31,7 +31,7 @@ class ReactRunnerTest extends TestBase {
     {
       $botProphecy = $this->prophesize(BotInterface::class);
       $botProphecy->poll()->shouldBeCalled();
-
+      $this->object->setLoopTimeout(0);
       $this->object->runBot($botProphecy->reveal(), 1);
 
     }

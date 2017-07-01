@@ -5,6 +5,11 @@ use React\EventLoop\Factory as EventLoopFactory;
 
 use React\EventLoop\LoopInterface;
 
+/**
+ * @class TelegramBot\ReactRunner
+ *
+ * runner for a bot using react event loop
+ */
 class ReactRunner implements RunnerInterface
 {
     public static function create() :ReactRunner
@@ -17,6 +22,11 @@ class ReactRunner implements RunnerInterface
 
     /** @var LoopInterface */
     private $loop;
+    /** @var int */
+    private $loopTimeout = 2;
+    /** @var int */
+    private $loopCounter = 0;
+
 
     /**
      * @param \React\EventLoop\LoopInterface
@@ -27,18 +37,25 @@ class ReactRunner implements RunnerInterface
         $this->loop = $loop;
     }
 
+    public function setLoopTimeout(int $timeout)
+    {
+      $this->loopTimeout = $timeout;
+    }
+
     /**
      * @param BotInterface
      * @param integer $maxTimesToPoll
      */
     public function runBot(BotInterface $bot, $maxTimesToPoll = null)
     {
-        $counter = 0;
+        $this->loopCounter = 0;
 
-        $this->loop->addPeriodicTimer(2, function (\React\EventLoop\Timer\Timer $timer) use ($bot, $maxTimesToPoll, &$counter) {
+        $this->loop->addPeriodicTimer(
+          $this->loopTimeout,
+          function (\React\EventLoop\Timer\Timer $timer) use ($bot, $maxTimesToPoll) {
             $bot->poll();
-
-            if (!is_null($maxTimesToPoll) && ($maxTimesToPoll >= $counter)) {
+            $this->loopCounter++;
+            if (!is_null($maxTimesToPoll) && ($maxTimesToPoll >= $this->loopCounter)) {
                 $this->loop->cancelTimer($timer);
             }
         });
