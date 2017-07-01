@@ -1,10 +1,10 @@
 # TelegramBot
 Classes for creating a bot for telegram
 
-[![Build Status](https://travis-ci.org/MehrAlsNix/TelegramBot.svg?branch=master)](https://travis-ci.org/MehrAlsNix/TelegramBot)
+[![Build Status](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/build-status/develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=develop)
-[![Code Coverage](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=master)
-[![Build Status](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/build-status/master)
+[![Code Coverage](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=develop)
+
 ## Example
 
 ```php
