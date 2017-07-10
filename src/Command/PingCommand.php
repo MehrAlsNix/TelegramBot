@@ -2,6 +2,7 @@
 
 namespace TelegramBot\Command;
 
+use TelegramBot\APIMessage;
 use TelegramBot\CommandInterface;
 use League\Event\EventInterface;
 
@@ -18,7 +19,9 @@ class PingCommand implements CommandInterface
      */
     public function handle(EventInterface $event, $param = [])
     {
-      $event->stopPropagation();
-      $param['responder']('pong !');
+        $event->stopPropagation();
+        /** @var \Telegrambot\APIMessage */
+        $message = $param['message'];
+        $param['responder']('pong !');
     }
 }

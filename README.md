@@ -1,17 +1,35 @@
 # TelegramBot
 Classes for creating a bot for telegram
 
-[![Build Status](https://travis-ci.org/MehrAlsNix/TelegramBot.svg?branch=master)](https://travis-ci.org/MehrAlsNix/TelegramBot)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=master)
-[![Build Status](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/build.png?b=master)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/build-status/master)
+[![Build Status](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/build-status/develop)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=develop)
+[![Code Coverage](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/MehrAlsNix/TelegramBot/?branch=develop)
+
 ## Example
 
 ```php
-$bot = new TelegramBot\Bot("BOT_TOKEN");
+#!/usr/bin/env php
+<?php
+require_once './vendor/autoload.php';
+
+/** @var LoopInterface */
+$loop = React\EventLoop\Factory::create();
+
+$runner = new TelegramBot\ReactRunner($loop);
+
+$resolverFactory = new React\Dns\Resolver\Factory();
+$resolver = $resolverFactory->create('8.8.8.8', $loop);
+$HttpClient = (new React\HttpClient\Factory)->create(
+  $loop,
+  $resolver
+);
+
+$apiClient = new TelegramBot\APIPollClient(getenv('BOT_TOKEN'), $HttpClient);
+
+$bot = new TelegramBot\Bot($apiClient);
+
 $bot->addListener('/ping', new TelegramBot\Command\PingCommand);
 
-$runner = TelegramBot\ReactRunner::create();
 $runner->runBot($bot);
 
 ```

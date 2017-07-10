@@ -12,13 +12,9 @@ use League\Event\ListenerInterface;
 class ReactRunnerTest extends TestBase {
 
     public function setUp() {
-      $this->clientProphecy = $this->prophesize(Client::class);
-      $this->loopProphery = $this->prophesize(LoopInterface::class);
+      $this->clientProphecy = $this->prophesize(APIPollClient::class);
       $loop = \React\EventLoop\Factory::create();
-      $this->object = new ReactRunner(
-        $loop,
-        $this->clientProphecy->reveal()
-      );
+      $this->object = new ReactRunner($loop);
     }
 
     public function testObject()
@@ -34,9 +30,8 @@ class ReactRunnerTest extends TestBase {
     public function testListenerGetsCalledOnEmit()
     {
       $botProphecy = $this->prophesize(BotInterface::class);
-      $botProphecy->setClient(\Prophecy\Argument::any())->shouldBeCalled();
       $botProphecy->poll()->shouldBeCalled();
-
+      $this->object->setLoopTimeout(0);
       $this->object->runBot($botProphecy->reveal(), 1);
 
     }
@@ -47,11 +42,9 @@ class ReactRunnerTest extends TestBase {
     public function testBotPollThrowsException()
     {
       $botProphecy = $this->prophesize(BotInterface::class);
-      $botProphecy->setClient(\Prophecy\Argument::any())->shouldBeCalled();
       $botProphecy->poll()->willThrow(new \Exception());
 
       $this->object->runBot($botProphecy->reveal(), 1);
-
     }
 
 }

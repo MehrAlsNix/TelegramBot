@@ -1,57 +1,65 @@
 <?php
 namespace TelegramBot;
 
-use React\HttpClient\Client;
+use React\EventLoop\Factory as EventLoopFactory;
+
 use React\EventLoop\LoopInterface;
 
+/**
+ * @class TelegramBot\ReactRunner
+ *
+ * runner for a bot using react event loop
+ */
 class ReactRunner implements RunnerInterface
 {
-
-
     public static function create() :ReactRunner
     {
-      $loop = \React\EventLoop\Factory::create();
+        /** @var LoopInterface */
+      $loop = EventLoopFactory::create();
 
-      $resolver = (new \React\Dns\Resolver\Factory)->create('8.8.8.8', $loop);
-      $client = (new \React\HttpClient\Factory)->create($loop, $resolver);
-
-      return new self($loop, $client);
+        return new self($loop);
     }
 
     /** @var LoopInterface */
     private $loop;
-    /** @var Client */
-    private $client;
+    /** @var int */
+    private $loopTimeout = 2;
+    /** @var int */
+    private $loopCounter = 0;
+
 
     /**
      * @param \React\EventLoop\LoopInterface
      * @param \React\HttpClient\Client
      */
-    public function __construct(LoopInterface $loop, Client $client)
+    public function __construct(LoopInterface $loop)
     {
-      $this->loop = $loop;
-      $this->client = $client;
+        $this->loop = $loop;
+    }
+
+    public function setLoopTimeout(int $timeout)
+    {
+      $this->loopTimeout = $timeout;
     }
 
     /**
      * @param BotInterface
-     * @param integer $times
+     * @param integer $maxTimesToPoll
      */
-    public function runBot(BotInterface $bot, $times = null)
+    public function runBot(BotInterface $bot, $maxTimesToPoll = null)
     {
-      $counter = 0;
-      $bot->setClient($this->client);
+        $this->loopCounter = 0;
 
-      $this->loop->addPeriodicTimer(2, function (\React\EventLoop\Timer\Timer $timer) use ($bot, $times, &$counter) {
+        $this->loop->addPeriodicTimer(
+          $this->loopTimeout,
+          function (\React\EventLoop\Timer\Timer $timer) use ($bot, $maxTimesToPoll) {
+            $bot->poll();
+            $this->loopCounter++;
+            if (!is_null($maxTimesToPoll) && ($maxTimesToPoll >= $this->loopCounter)) {
+                $this->loop->cancelTimer($timer);
+            }
+        });
 
-        $bot->poll();
-
-        if ( $times && $times >= $counter) {
-          $this->loop->cancelTimer($timer);
-        }
-      });
-
-      $this->loop->run();
+        $this->loop->run();
     }
-
 }

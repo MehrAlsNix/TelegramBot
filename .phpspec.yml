@@ -1,0 +1,4 @@
+suites:
+    telegrambot_suite:
+        namespace: TelegramBot\
+        psr4_prefix: TelegramBot\

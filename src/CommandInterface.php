@@ -4,6 +4,6 @@ namespace TelegramBot;
 
 use League\Event\ListenerInterface;
 
-interface CommandInterface extends ListenerInterface {
-
+interface CommandInterface extends ListenerInterface
+{
 }

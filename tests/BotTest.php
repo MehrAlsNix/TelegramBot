@@ -3,7 +3,8 @@
 namespace TelegramBot\Test;
 
 use TelegramBot\Bot;
-use React\HttpClient\Client;
+use TelegramBot\APIMessage;
+use TelegramBot\APIPollClient;
 
 use Prophecy\Argument;
 
@@ -13,9 +14,8 @@ class BotTest extends TestBase {
   private $clientProphecy;
 
   public function setUp() {
-    $this->clientProphecy = $this->prophesize(Client::class);
-    $this->object = new Bot("SOME_BOT_TOKEN");
-    $this->object->setClient($this->clientProphecy->reveal());
+    $this->clientProphecy = $this->prophesize(APIPollClient::class);
+    $this->object = new Bot($this->clientProphecy->reveal());
 
   }
 
@@ -28,61 +28,49 @@ class BotTest extends TestBase {
    */
   public function testPoll()
   {
-    $this->markTestIncomplete( 'must thing about the http part first!');
-    $response = $this->prophesize( \React\HttpClient\Response::class);
-
-    $request = $this->prophesize( \React\HttpClient\Request::class);
-    $request->on('response', Argument::any())
-      ->willReturn($response);
-
     $this->clientProphecy
-      ->request(Argument::any())
-      ->willReturn($request->reveal())
+      ->poll(Argument::any())
       ->shouldBeCalled();
 
     $this->object->poll();
   }
 
+  public function testHandlePollResponse()
+  {
+    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $response->on('data', Argument::cetera())->shouldBeCalled();
+    $response->on('error', Argument::cetera())->shouldBeCalled();
 
-  public function testGetResonder() {
-    $returnType = gettype($this->object->getResponder([]));
-    $this->assertEquals('object', $returnType);
+    $this->object->_handlePollResponse($response->reveal());
   }
 
-  public function testGetResponseHeaders() {
-
-    $this->assertEquals(
-      ['Content-Type' => 'application/x-www-form-urlencoded', 'Content-Length' => 11],
-      $this->object->getResponseHeaders('test_string')
-    );
-  }
-
-  public function testGetMessagesRequest() {
-    $request = $this->prophesize( \React\HttpClient\Request::class);
-
+  public function testHandlePollData()
+  {
+    $data = '{"result": [{"message": {"text": "test"}}]}';
+    $response = $this->prophesize( \React\HttpClient\Response::class);
     $this->clientProphecy
-      ->request('GET', Argument::cetera())
-      ->willReturn($request->reveal())
-      ->shouldBeCalled();
-    $this->object->getMassagesRequest();
+      ->markMessageHandled(Argument::type(APIMessage::class))
+      ->shouldBeCalled()
+    ;
+    $this->object->_handlePollData($data, $response->reveal());
+  }
+  public function testHandlePollDataMissingText()
+  {
+    $data = '{"result": [{}]}';
+    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $this->clientProphecy
+      ->markMessageHandled(Argument::type(APIMessage::class))
+      ->shouldBeCalled()
+    ;
+    $this->object->_handlePollData($data, $response->reveal());
   }
 
-  public function testSendResponse() {
-
-    $request = $this->prophesize( \React\HttpClient\Request::class);
-    $request->end(Argument::any())->shouldBeCalled();
-
-    $this->clientProphecy
-      ->request('POST', Argument::cetera())
-      ->willReturn($request->reveal())
-      ->shouldBeCalled();
-
-    $this->object->sendResponse('pong', [
-      'message' => [
-        'message_id' => 123,
-        'chat' => ['id' => 1]
-        ]
-      ]
-    );
+  /**
+  * @expectedException \Exception
+  */
+  public function testHandlePollError()
+  {
+    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $this->object->_handlePollError($response->reveal());
   }
 }
