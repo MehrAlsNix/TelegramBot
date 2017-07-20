@@ -2,28 +2,40 @@
 
 namespace TelegramBot;
 
+use React\Dns\Resolver\Factory;
+use React\HttpClient\Factory as HttpClientFactory;
+
 class BotFactory
 {
+    private $HttpClient;
+    private $resolver;
+    private $resolverFactory;
 
+    /**
+     * BotFactory constructor.
+     *
+     * @param $loop
+     */
     public function __construct($loop)
     {
-      $this->resolverFactory = new \React\Dns\Resolver\Factory();
-      $this->resolver = $this->resolverFactory->create('8.8.8.8', $loop);
-      $this->HttpClient = (new \React\HttpClient\Factory)->create(
-        $loop,
-        $this->resolver
-      );
+        $this->resolverFactory = new Factory();
+        $this->resolver = $this->resolverFactory->create('8.8.8.8', $loop);
+        $this->HttpClient = (new HttpClientFactory)->create(
+            $loop,
+            $this->resolver
+        );
 
     }
 
-
-    public function createWithToken($token)
+    /**
+     * @param string $token
+     * @return Bot
+     */
+    public function createWithToken(string $token): Bot
     {
 
-      $apiClient = new APIPollClient($token, $this->HttpClient);
+        $apiClient = new APIPollClient($token, $this->HttpClient);
 
-      $bot = new Bot($apiClient);
-
-      return $bot;
+        return new Bot($apiClient);
     }
 }

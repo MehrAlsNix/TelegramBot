@@ -19,7 +19,7 @@ class APIMessage
         return $this->data;
     }
 
-    public function hasText()
+    public function hasText(): bool
     {
         return isset($this->data['message']['text']);
     }
@@ -32,13 +32,13 @@ class APIMessage
         return $this->data['message']['text'];
     }
 
-    public function getResponseData($responseText)
+    public function getResponseData($responseText): array
     {
         return [
-      'chat_id' => $this->data['message']['chat']['id'],
-      'reply_to_message_id' => $this->data['message']['message_id'],
-      'text' => $responseText
-    ];
+            'chat_id' => $this->data['message']['chat']['id'],
+            'reply_to_message_id' => $this->data['message']['message_id'],
+            'text' => $responseText
+        ];
     }
 
     public function getUpdateId()

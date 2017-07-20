@@ -2,6 +2,7 @@
 
 namespace TelegramBot\Test;
 
+use React\HttpClient\Response;
 use TelegramBot\Bot;
 use TelegramBot\APIMessage;
 use TelegramBot\APIPollClient;
@@ -37,7 +38,7 @@ class BotTest extends TestBase {
 
   public function testHandlePollResponse()
   {
-    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $response = $this->prophesize( Response::class);
     $response->on('data', Argument::cetera())->shouldBeCalled();
     $response->on('error', Argument::cetera())->shouldBeCalled();
 
@@ -47,7 +48,7 @@ class BotTest extends TestBase {
   public function testHandlePollData()
   {
     $data = '{"result": [{"message": {"text": "test"}}]}';
-    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $response = $this->prophesize( Response::class);
     $this->clientProphecy
       ->markMessageHandled(Argument::type(APIMessage::class))
       ->shouldBeCalled()
@@ -57,7 +58,7 @@ class BotTest extends TestBase {
   public function testHandlePollDataMissingText()
   {
     $data = '{"result": [{}]}';
-    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $response = $this->prophesize( Response::class);
     $this->clientProphecy
       ->markMessageHandled(Argument::type(APIMessage::class))
       ->shouldBeCalled()
@@ -70,7 +71,7 @@ class BotTest extends TestBase {
   */
   public function testHandlePollError()
   {
-    $response = $this->prophesize( \React\HttpClient\Response::class);
+    $response = $this->prophesize( Response::class);
     $this->object->_handlePollError($response->reveal());
   }
 }

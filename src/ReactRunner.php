@@ -1,9 +1,10 @@
 <?php
+
 namespace TelegramBot;
 
 use React\EventLoop\Factory as EventLoopFactory;
-
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\Timer;
 
 /**
  * @class TelegramBot\ReactRunner
@@ -12,19 +13,35 @@ use React\EventLoop\LoopInterface;
  */
 class ReactRunner implements RunnerInterface
 {
-    public static function create() :ReactRunner
+    public static function create(): ReactRunner
     {
-        /** @var LoopInterface */
-      $loop = EventLoopFactory::create();
+        /**
+         *
+         *
+         * @var LoopInterface
+         */
+        $loop = EventLoopFactory::create();
 
         return new self($loop);
     }
 
-    /** @var LoopInterface */
+    /**
+     *
+     *
+     * @var LoopInterface
+     */
     private $loop;
-    /** @var int */
+    /**
+     *
+     *
+     * @var int
+     */
     private $loopTimeout = 2;
-    /** @var int */
+    /**
+     *
+     *
+     * @var int
+     */
     private $loopCounter = 0;
 
 
@@ -39,7 +56,7 @@ class ReactRunner implements RunnerInterface
 
     public function setLoopTimeout(int $timeout)
     {
-      $this->loopTimeout = $timeout;
+        $this->loopTimeout = $timeout;
     }
 
     /**
@@ -51,14 +68,15 @@ class ReactRunner implements RunnerInterface
         $this->loopCounter = 0;
 
         $this->loop->addPeriodicTimer(
-          $this->loopTimeout,
-          function (\React\EventLoop\Timer\Timer $timer) use ($bot, $maxTimesToPoll) {
-            $bot->poll();
-            $this->loopCounter++;
-            if (!is_null($maxTimesToPoll) && ($maxTimesToPoll >= $this->loopCounter)) {
-                $this->loop->cancelTimer($timer);
+            $this->loopTimeout,
+            function (Timer $timer) use ($bot, $maxTimesToPoll) {
+                $bot->poll();
+                $this->loopCounter++;
+                if (null !== $maxTimesToPoll && ($maxTimesToPoll >= $this->loopCounter)) {
+                    $this->loop->cancelTimer($timer);
+                }
             }
-        });
+        );
 
         $this->loop->run();
     }
